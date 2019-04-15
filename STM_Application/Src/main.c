@@ -55,6 +55,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "usbd_cdc_if.h"
+#include "lis3dsh.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -79,6 +80,7 @@ SPI_HandleTypeDef hspi1;
 uint8_t DataToSend[40]; // Tablica zawierajaca dane do wyslania
 uint8_t MessageCounter = 0; // Licznik wyslanych wiadomosci
 uint8_t MessageLength = 0; // Zawiera dlugosc wysylanej wiadomosci
+float accX, accY, accZ, out[4]; // Zawiera dane z akcelerometru
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -130,12 +132,36 @@ int main(void)
   data[1] = '0';
   data[2] = '0';
   data[3] = '0';
+
+  LISInit(); // Akcelerometr
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  // Odczytywanie wartoœci akcelerometru
+
+	  LIS3DSH_ReadACC(out);
+	  accX = out[0];
+	  accY = out[1];
+	  accZ = out[2];
+
+	  // Warunek wyslania sygna³u o szarpniêciu
+
+	  float wartosc = 0;
+
+	  wartosc = accX*accX + accY*accY + accZ*accZ;
+
+	  if(wartosc > 100)
+	  {
+		  // data[4] = '1';
+	  }
+	  else
+	  {
+		  // data[4] = '0';
+	  }
+
 	  if(HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_0) == GPIO_PIN_RESET)
 	  {
 		  HAL_Delay(10);
@@ -196,12 +222,6 @@ int main(void)
 	  CDC_Transmit_FS(data,4);
 	  HAL_Delay(10);
 
-	  // Do sprawdzenia w STM Studio
-	  uint8_t d0, d1, d2, d3;
-	  d0 = data[0];
-	  d1 = data[1];
-	  d2 = data[2];
-	  d3 = data[3];
 
     /* USER CODE END WHILE */
 
