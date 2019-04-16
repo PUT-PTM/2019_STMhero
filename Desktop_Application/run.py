@@ -44,7 +44,7 @@ class Game(object):
         pygame.mixer.pre_init(44100, -16, 1, 512)
         pygame.font.init()
         pygame.init()
-        self.screen = pygame.display.set_mode((480,720))
+        self.screen = pygame.display.set_mode((480, 720))
         pygame.mixer.music.load('Nirvana - Smells Like Teens Spirit.mp3')
         self.tps_clock = pygame.time.Clock()
         self.tps_delta = 0.0
@@ -56,9 +56,33 @@ class Game(object):
 
         # Game loop
         while True:
-
+            self.holds = [0, 0, 0, 0]
             # Handle events
             if com == 'none':
+                key = pygame.key.get_pressed()
+                for b in self.song.buttons:
+                    if b.hold > 0:
+                        if b.y in range(650, 650 + b.hold):
+                            if b.pos == 0:
+                                if key[pygame.K_q]:
+                                    if b.check:
+                                        self.song.points += 1
+                                        self.holds[0] = 1
+                            if b.pos == 1:
+                                if key[pygame.K_w]:
+                                    if b.check:
+                                        self.song.points += 1
+                                        self.holds[1] = 1
+                            if b.pos == 2:
+                                if key[pygame.K_e]:
+                                    if b.check:
+                                        self.song.points += 1
+                                        self.holds[2] = 1
+                            if b.pos == 3:
+                                if key[pygame.K_r]:
+                                    if b.check:
+                                        self.song.points += 1
+                                        self.holds[3] = 1
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         sys.exit(0)
@@ -69,28 +93,21 @@ class Game(object):
                                     if b.check == False:
                                         b.check = True
                                         self.song.points += 1
-                                    else:
-                                        self.song.points -= 1
                                 elif event.key == pygame.K_w and b.pos == 1:
                                     if b.check == False:
                                         b.check = True
                                         self.song.points += 1
-                                    else:
-                                        self.song.points -= 1
                                 elif event.key == pygame.K_e and b.pos == 2:
                                     if b.check == False:
                                         b.check = True
                                         self.song.points += 1
-                                    else:
-                                        self.song.points -= 1
                                 elif event.key == pygame.K_r and b.pos == 3:
                                     if b.check == False:
                                         b.check = True
                                         self.song.points += 1
-                                    else:
-                                        self.song.points -= 1
                                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                                     sys.exit(0)
+
             else:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -105,26 +122,42 @@ class Game(object):
                             if b.check == False:
                                 b.check = True
                                 self.song.points += 1
-                            else:
-                                self.song.points -= 1
                         elif self.buttons[1] == '1' and self.last_buttons[1] == '0' and b.pos == 1:
                             if b.check == False:
                                 b.check = True
                                 self.song.points += 1
-                            else:
-                                self.song.points -= 1
                         elif self.buttons[2] == '1' and self.last_buttons[2] == '0' and b.pos == 2:
                             if b.check == False:
                                 b.check = True
                                 self.song.points += 1
-                            else:
-                                 self.song.points -= 1
-                        elif self.buttons[3] == 'c' and self.last_buttons[3] == '0' and b.pos == 3:
+                        elif self.buttons[3] == '1' and self.last_buttons[3] == '0' and b.pos == 3:
                             if b.check == False:
                                 b.check = True
                                 self.song.points += 1
-                            else:
-                                self.song.points -= 1
+
+                    if b.hold > 0:
+                        if b.y in range(650, 650 + b.hold):
+                            if self.buttons[4] == '1':
+                                if b.pos == 0:
+                                    if self.buttons[0] == '1':
+                                        if b.check:
+                                            self.song.points += 1
+                                            self.holds[0] = 1
+                                if b.pos == 1:
+                                    if self.buttons[1] == '1':
+                                        if b.check:
+                                            self.song.points += 1
+                                            self.holds[1] = 1
+                                if b.pos == 2:
+                                    if self.buttons[2] == '1':
+                                        if b.check:
+                                            self.song.points += 1
+                                            self.holds[2] = 1
+                                if b.pos == 3:
+                                    if self.buttons[3] == '1':
+                                        if b.check:
+                                            self.song.points += 1
+                                            self.holds[3] = 1
 
             # Ticking
             self.tps_delta += self.tps_clock.tick() / 1000.0
@@ -140,13 +173,15 @@ class Game(object):
     def tick(self):
         self.text = self.font.render(str(self.song.points), True, (255, 255, 255))
         self.song.tick()
+
     def draw(self):
         self.screen.blit(self.text, (50, 50))
         self.song.draw()
         self.checkbox.draw()
 
+
 if __name__ == "__main__":
     print("Available COM ports: " + str(serial_ports()))
     print("Enter the name of the COM port or type 'none' for playing on keyboard: ")
-    input = input()
-    Game(input)
+    inp = input()
+    Game(inp)
