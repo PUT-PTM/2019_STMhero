@@ -13,8 +13,6 @@ class Check_box(object):
         self.lines.append(((10, 610),(10, 710)))
         self.lines.append(((470, 610),(470, 710)))
 
-
-
     def draw(self):
         # Draw lines
         for l in self.lines:
