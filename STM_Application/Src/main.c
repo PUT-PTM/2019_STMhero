@@ -167,8 +167,15 @@ int main(void)
 	  }
 	  else
 	  {
-		  switched1 = 0;
-		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
+		  if(HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_4) == GPIO_PIN_SET && switched1==1)
+		  {
+			  switched1 = 2;
+		  }
+		  else
+		  {
+			  switched1 = 0;
+			  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
+		  }
 	  }
 
 	  if(HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_5) == GPIO_PIN_SET && switched2==0)
@@ -179,8 +186,15 @@ int main(void)
 	  }
 	  else
 	  {
-		  switched2 = 0;
-		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
+		  if(HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_5) == GPIO_PIN_SET && switched2==1)
+		  {
+			  switched2 = 2;
+		  }
+		  else
+		  {
+			  switched2 = 0;
+			  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
+		  }
 	  }
 
 
@@ -205,8 +219,15 @@ int main(void)
 	  }
 	  else
 	  {
-		  switched3 = 0;
-		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+		  if(adc1val > limit && switched3 == 1)
+		  {
+			  switched3 = 2;
+		  }
+		  else
+		  {
+			  switched3 = 0;
+			  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+		  }
 	  }
 
 	  if(adc2val > limit && switched4 == 0)
@@ -216,8 +237,15 @@ int main(void)
 	  }
 	  else
 	  {
-		  switched4 = 0;
-		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+		  if(adc2val > limit && switched4 == 1)
+		  {
+			  switched4 = 2;
+		  }
+		  else
+		  {
+			  switched4 = 0;
+			  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+		  }
 	  }
 	  // Odczytywanie wartoœci akcelerometru
 
