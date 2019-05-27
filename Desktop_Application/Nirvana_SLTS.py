@@ -22,6 +22,7 @@ class Button(object):
         self.w = 20
         self.check = False
         self.hold = hold
+        self.holded = False
 
 
 class Buttons(object):

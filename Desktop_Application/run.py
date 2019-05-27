@@ -2,6 +2,7 @@ import pygame
 import sys
 import serial
 import glob
+import random
 from Nirvana_SLTS import Nslts
 from CheckBox import Check_box
 from ComReader import ComReader
@@ -46,17 +47,28 @@ class Game(object):
         pygame.init()
         self.screen = pygame.display.set_mode((480, 720))
         pygame.mixer.music.load('Nirvana - Smells Like Teens Spirit.mp3')
+        self.ogien1 = pygame.image.load('ogien.gif').convert_alpha()
+        self.ogien2 = pygame.image.load('ogien2.gif').convert_alpha()
         self.tps_clock = pygame.time.Clock()
         self.tps_delta = 0.0
         self.song = Nslts(self)
         self.checkbox = Check_box(self)
         self.font = pygame.font.SysFont("comicsansms", 72)
         self.text = self.font.render("0", True, (255, 255, 255))
+        self.pressed = [0, 0, 0, 0]
         pygame.mixer.music.play()
 
         # Game loop
         while True:
             self.holds = [0, 0, 0, 0]
+            if self.pressed[0] > 0:
+                self.pressed[0] -= 1
+            if self.pressed[1] > 0:
+                self.pressed[1] -= 1
+            if self.pressed[2] > 0:
+                self.pressed[2] -= 1
+            if self.pressed[3] > 0:
+                self.pressed[3] -= 1
             # Handle events
             if com == 'none':
                 key = pygame.key.get_pressed()
@@ -90,21 +102,25 @@ class Game(object):
                         if event.type == pygame.KEYDOWN:
                             if b.y in range(640, 681):
                                 if event.key == pygame.K_q and b.pos == 0:
-                                    if b.check == False:
+                                    if not b.check:
                                         b.check = True
-                                        self.song.points += 1
+                                        self.song.points += 100
+                                        self.pressed[0] = 40
                                 elif event.key == pygame.K_w and b.pos == 1:
-                                    if b.check == False:
+                                    if not b.check:
                                         b.check = True
-                                        self.song.points += 1
+                                        self.song.points += 100
+                                        self.pressed[1] = 40
                                 elif event.key == pygame.K_e and b.pos == 2:
-                                    if b.check == False:
+                                    if not b.check:
                                         b.check = True
-                                        self.song.points += 1
+                                        self.song.points += 100
+                                        self.pressed[2] = 40
                                 elif event.key == pygame.K_r and b.pos == 3:
-                                    if b.check == False:
+                                    if not b.check:
                                         b.check = True
-                                        self.song.points += 1
+                                        self.song.points += 100
+                                        self.pressed[3] = 40
                                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                                     sys.exit(0)
 
@@ -119,45 +135,43 @@ class Game(object):
                         self.buttons = self.com_reader.data
                         self.last_buttons = help
                         if self.buttons[0] == '1' and self.last_buttons[0] == '0' and b.pos == 0:
-                            if b.check == False:
+                            if not b.check:
                                 b.check = True
-                                self.song.points += 1
+                                self.song.points += 100
                         elif self.buttons[1] == '1' and self.last_buttons[1] == '0' and b.pos == 1:
-                            if b.check == False:
+                            if not b.check:
                                 b.check = True
-                                self.song.points += 1
+                                self.song.points += 100
                         elif self.buttons[2] == '1' and self.last_buttons[2] == '0' and b.pos == 2:
-                            if b.check == False:
+                            if not b.check:
                                 b.check = True
-                                self.song.points += 1
+                                self.song.points += 100
                         elif self.buttons[3] == '1' and self.last_buttons[3] == '0' and b.pos == 3:
-                            if b.check == False:
+                            if not b.check:
                                 b.check = True
-                                self.song.points += 1
+                                self.song.points += 100
 
                     if b.hold > 0:
                         if b.y in range(650, 650 + b.hold):
                             if self.buttons[4] == '1':
-                                if b.pos == 0:
-                                    if self.buttons[0] == '1':
-                                        if b.check:
-                                            self.song.points += 1
-                                            self.holds[0] = 1
-                                if b.pos == 1:
-                                    if self.buttons[1] == '1':
-                                        if b.check:
-                                            self.song.points += 1
-                                            self.holds[1] = 1
-                                if b.pos == 2:
-                                    if self.buttons[2] == '1':
-                                        if b.check:
-                                            self.song.points += 1
-                                            self.holds[2] = 1
-                                if b.pos == 3:
-                                    if self.buttons[3] == '1':
-                                        if b.check:
-                                            self.song.points += 1
-                                            self.holds[3] = 1
+                                if not b.holded:
+                                    b.holded = True
+                            if b.pos == 0:
+                                    if b.holded:
+                                        self.song.points += 1
+                                        self.holds[0] = 1
+                            if b.pos == 1:
+                                    if b.holded:
+                                        self.song.points += 1
+                                        self.holds[1] = 1
+                            if b.pos == 2:
+                                    if b.holded:
+                                        self.song.points += 1
+                                        self.holds[2] = 1
+                            if b.pos == 3:
+                                    if b.holded:
+                                        self.song.points += 1
+                                        self.holds[3] = 1
 
             # Ticking
             self.tps_delta += self.tps_clock.tick() / 1000.0
@@ -175,9 +189,35 @@ class Game(object):
         self.song.tick()
 
     def draw(self):
-        self.screen.blit(self.text, (50, 50))
         self.song.draw()
         self.checkbox.draw()
+        self.effects()
+        text_rect = self.text.get_rect(center=(240, 40))
+        self.screen.blit(self.text, text_rect)
+
+    def effects(self):
+        rand = random.randrange(6)
+        print(rand%2)
+        if self.holds[0] or self.pressed[0]:
+            if rand % 2 == 0:
+                pygame.display.get_surface().blit(self.ogien1, (10, 610))
+            else:
+                pygame.display.get_surface().blit(self.ogien2, (10, 610))
+        if self.holds[1] or self.pressed[1]:
+            if rand % 2 == 0:
+                pygame.display.get_surface().blit(self.ogien1, (125, 610))
+            else:
+                pygame.display.get_surface().blit(self.ogien2, (125, 610))
+        if self.holds[2] or self.pressed[2]:
+            if rand % 2 == 0:
+                pygame.display.get_surface().blit(self.ogien1, (260, 610))
+            else:
+                pygame.display.get_surface().blit(self.ogien2, (260, 610))
+        if self.holds[3] or self.pressed[3]:
+            if rand % 2 == 0:
+                pygame.display.get_surface().blit(self.ogien1, (375, 610))
+            else:
+                pygame.display.get_surface().blit(self.ogien2, (375, 610))
 
 
 if __name__ == "__main__":
