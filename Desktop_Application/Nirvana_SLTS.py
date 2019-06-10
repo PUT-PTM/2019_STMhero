@@ -76,7 +76,7 @@ class Buttons(object):
             buttons.append((2, 670 - (9 + i * 4) * 2 * 119 - 60 * int(14.875) - delay-12*i-50))
             buttons.append((3, 670 - (9 + i * 4) * 2 * 119 - 68 * int(14.875) - delay-12*i-50))
 
-        # Intro
+        # Ref
         delay = 20
         for i in range(0, 6):
             buttons.append((0, 670 - (66+i*4) * 2 * 119 - int(2*14.875) - delay - i*22))
@@ -89,6 +89,33 @@ class Buttons(object):
             buttons.append((2, 670 - (69 + i * 4) * 2 * 119 - int(4*14.875) - delay - i*22))
             buttons.append((2, 670 - (69+i*4) * 2 * 119 - int(8*14.875) - delay - i*22))
             buttons.append((2, 670 - (69+i*4) * 2 * 119 - int(12*14.875) - delay - i*22))
+        #bridge
+        buttons.append((1, 670 - 2 * 10805))
+        buttons.append((0, 670 - 2 * 10829))
+        buttons.append((0, 670 - 2 * 10864))
+        buttons.append((2, 670 - 2 * 10918))
+        buttons.append((2, 670 - 2 * (10918 + 35)))
+        buttons.append((3, 670 - 2 * 10971))
+        buttons.append((1, 670 - 2 * 11026))
+        buttons.append((0, 670 - 2 * 11055))
+        buttons.append((0, 670 - 2 * 11087))
+        buttons.append((3, 670 - 2 * 11134))
+        buttons.append((3, 670 - 2 * 11165))
+        buttons.append((3, 670 - 2 * 11197))
+        buttons.append((2, 670 - 2 * 11223))
+        buttons.append((1, 670 - 2 * (10805 + 484)))
+        buttons.append((0, 670 - 2 * (10829 + 484)))
+        buttons.append((0, 670 - 2 * (10864 + 484)))
+        buttons.append((2, 670 - 2 * (10918 + 484)))
+        buttons.append((2, 670 - 2 * (10918 + 35 + 484)))
+        buttons.append((3, 670 - 2 * (10971 + 484)))
+        buttons.append((1, 670 - 2 * (11026 + 484+20)))
+        buttons.append((0, 670 - 2 * (11055 + 484+20)))
+        buttons.append((0, 670 - 2 * (11087 + 484+20)))
+        buttons.append((3, 670 - 2 * (11134 + 484+20)))
+        buttons.append((3, 670 - 2 * (11165 + 484+20)))
+        buttons.append((3, 670 - 2 * (11197 + 484+20)))
+        buttons.append((2, 670 - 2 * (11223 + 484+20)))
         return buttons
 
 
@@ -109,6 +136,8 @@ class Nslts(object):
         self.buttons[51].hold = 238
         self.buttons[53].hold = 238
         self.buttons[55].hold = 238
+        self.buttons[166].hold = 75
+        self.buttons[153].hold = 75
         for i in range(56, 88):
             self.buttons[i].hold = 100
 

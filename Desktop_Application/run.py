@@ -197,7 +197,6 @@ class Game(object):
 
     def effects(self):
         rand = random.randrange(6)
-        print(rand%2)
         if self.holds[0] or self.pressed[0]:
             if rand % 2 == 0:
                 pygame.display.get_surface().blit(self.ogien1, (10, 610))
