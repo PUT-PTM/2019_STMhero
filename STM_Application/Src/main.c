@@ -83,11 +83,18 @@ SPI_HandleTypeDef hspi1;
 uint8_t DataToSend[40]; // Tablica zawierajaca dane do wyslania
 uint8_t MessageCounter = 0; // Licznik wyslanych wiadomosci
 uint8_t MessageLength = 0; // Zawiera dlugosc wysylanej wiadomosci
-float accX, accY, accZ, out[4], last_out[3], wartosc; // Zawiera dane z akcelerometru
+float accX, accY, accZ, out[4]; // Zawiera dane z akcelerometru
 
 uint16_t adc1val, adc2val; // Wartoœci odczytywane z fotorezystorów
 
-uint8_t switched = 0; // Do fotorezystorów (logika)
+
+// Do fotorezystorów
+uint8_t switched1 = 0;
+uint8_t switched2 = 0;
+uint8_t switched3 = 0;
+uint8_t switched4 = 0;
+
+uint16_t limit = 1200;	// Limit dla ADC
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -138,12 +145,14 @@ int main(void)
   MX_ADC1_Init();
   MX_ADC2_Init();
   /* USER CODE BEGIN 2 */
-  uint8_t data[5];
+  uint8_t data[6];
   data[0] = '0';
   data[1] = '0';
   data[2] = '0';
   data[3] = '0';
   data[4] = '0';
+  data[5] = '0';
+  char check = '0';
 
   LISInit(); // Akcelerometr
   /* USER CODE END 2 */
@@ -152,11 +161,84 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+//	  if(HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_4) == GPIO_PIN_SET){
+//		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
+//	  }
+//	  else{
+//		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
+//	  }
+//	  if(HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_5) == GPIO_PIN_SET){
+//	  		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
+//	  	  }
+//	  	  else{
+//	  		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
+//	  	  }
 
+	  if(HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_4) == GPIO_PIN_SET && switched1==0)
+	  {
+		  switched1 = 1;
+
+	  }
+		  if(HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_4) == GPIO_PIN_RESET && switched1==1)
+		  {
+			  switched1 = 2;
+		  }
+
+	  if(HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_5) == GPIO_PIN_SET && switched2==0)
+	  {
+		  switched2 = 1;
+
+	  }
+		  if(HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_5) == GPIO_PIN_RESET && switched2==1)
+		  {
+			  switched2 = 2;
+		  }
+
+
+	  HAL_ADC_Start(&hadc1);
+
+	  if(HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK)
+	  {
+		  adc1val = HAL_ADC_GetValue(&hadc1);
+	  }
+
+	  HAL_ADC_Start(&hadc2);
+
+	  if(HAL_ADC_PollForConversion(&hadc2, 10) == HAL_OK)
+	  {
+		  adc2val = HAL_ADC_GetValue(&hadc2);
+	  }
+//	  if(adc1val > limit){
+//		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+//	  }
+//	  else{
+//		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+//	  }
+//	  if(adc2val > limit){
+//	  		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+//	  	  }
+//	  	  else{
+//	  		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+//	  	  }
+	  if(adc1val > limit && switched3 == 0)
+	  {
+		  switched3 = 1;
+	  }
+		  if(adc1val <= limit && switched3 == 1)
+		  {
+			  switched3 = 2;
+		  }
+
+	  if(adc2val > limit && switched4 == 0)
+	  {
+		  switched4 = 1;
+	  }
+		  if(adc2val <= limit && switched4 == 1)
+		  {
+			  switched4 = 2;
+		  }
 	  // Odczytywanie wartoœci akcelerometru
-	  last_out[0] = accX;
-	  last_out[1] = accY;
-	  last_out[2] = accZ;
+
 	  LIS3DSH_ReadACC(out);
 	  accX = out[0];
 	  accY = out[1];
@@ -164,157 +246,90 @@ int main(void)
 
 	  // Warunek wyslania sygna³u o szarpniêciu
 
+	  float wartosc = 0;
 
 	  wartosc = accX*accX + accY*accY + accZ*accZ;
 
 	  if(wartosc < 100000 || wartosc > 2000000)
 	  {
-		  data[4] = '1';
+		   data[4] = '1';
 	  }
 	  else
 	  {
-		  data[4] = '0';
+		   data[4] = '0';
 	  }
 
-	  if(HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_0) == GPIO_PIN_RESET)
+	  if(switched1==2 || switched2==2 || switched3 == 2 || switched4 == 2)
 	  {
-		  HAL_Delay(10);
+		  data[5] = '1';
+
+		  switched1 = 0;
+		  switched2 = 0;
+		  switched3 = 0;
+		  switched4 = 0;
+	  }
+	  else data[5] = '0';
+		  check='1';
 		  if(HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_0) == GPIO_PIN_RESET)
 		  {
-			  data[0] = '1';
-			  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
-		  }
-		  else
+			  if(HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_0) == GPIO_PIN_RESET)
 			  {
-			  	  data[0] ='0';
-			  	  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
+				  data[1] = '1';
 			  }
-	  }
-	  else
-	  			  {
-	  			  	  data[0] ='0';
-	  			  	  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
-	  			  }
-	  if(HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_1) == GPIO_PIN_RESET)
-	  	  {
-	  		  HAL_Delay(10);
-	  		  if(HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_1) == GPIO_PIN_RESET)
-	  		  {
-	  			  data[1] = '1';
-	  			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
-	  		  }
-	  		 else {
-	  			 data[1] = '0';
-	  			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
-	  		 }
-	  	  }
-	  else {
-	  	  			 data[1] = '0';
-	  	  			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
-	  	  		 }
-	  if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_0) == GPIO_PIN_RESET)
-	  	  {
-	  		  HAL_Delay(10);
-	  		  if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_0) == GPIO_PIN_RESET)
-	  		  {
-	  			  data[2] = '1';
-	  			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
-	  		  }
-	  		 else {
-	  			 data[2] = '0';
-	  			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
-	  		 }
-	  	  }
-	  else {
-	  	  			 data[2] = '0';
-	  	  			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
-	  	  		 }
-	  if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_1) == GPIO_PIN_RESET)
-	  	  {
-	  		  HAL_Delay(10);
-	  		  if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_1) == GPIO_PIN_RESET)
-	  		  {
-	  			  data[3] = '1';
-	  			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
-	  		  }
-	  		 else {
-	  			 data[3] = '0';
-	  			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
-	  		 }
-	  	  }
-	  else {
-	  	  			 data[3] = '0';
-	  	  			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
-	  	  		 }
-	  CDC_Transmit_FS(data,5);
+			  else
+			  {
+				  data[1] ='0';
+			  }
+		  }
+		  else data[1] = '0';
+		  if(HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_1) == GPIO_PIN_RESET)
+		  {
+			  if(HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_1) == GPIO_PIN_RESET)
+			  {
+				  data[0] = '1';
+			  }
+			  else {
+				  data[0] = '0';
+			  }
+		  }
+		  else data[0] = '0';
+		  if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_0) == GPIO_PIN_RESET)
+		  {
+			  if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_0) == GPIO_PIN_RESET)
+			  {
+				  data[2] = '1';
+			  }
+			  else {
+				  data[2] = '0';
+			  }
+		  }
+		  else data[2] = '0';
+		  if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_1) == GPIO_PIN_RESET)
+		  {
+			  if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_1) == GPIO_PIN_RESET)
+			  {
+				  data[3] = '1';
+			  }
+			  else {
+				  data[3] = '0';
+			  }
+		  }
+		  else data[3] = '0';
+		  CDC_Transmit_FS(data,6);
+		  HAL_Delay(10);
+//	  char snum1[5];
+//	  itoa(switched1, snum1, 10);
+//	  char snum2[5];
+//	  	  itoa(switched2, snum2, 10);
+//	  	char snum3[5];
+//	  		  itoa(switched3, snum3, 10);
+//	  		char snum4[5];
+//	  			  itoa(switched4, snum4, 10);
+//	  strcat(snum1,snum2);
+//	  strcat(snum1,snum3);
+//	  	strcat(snum1,snum4);
+//	  CDC_Transmit_FS(snum2,strlen(snum3));
 	  HAL_Delay(10);
-
-	  // Wartoœci: 1.32, 1.65, 1.98 (V)
-	  // kolejno: 1638, 2047, 2457
-	  // dolna, œrodkowa i górna - wyliczone - wartoœci optymalne do zbadania
-	  /*
-	  HAL_ADC_Start(&hadc1);
-
-	  if(HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK)
-	  {
-	      adc1val = HAL_ADC_GetValue(&hadc1);
-	  }
-
-	  HAL_ADC_Start(&hadc2);
-
-	  if(HAL_ADC_PollForConversion(&hadc2, 10) == HAL_OK)
-	  {
-	      adc2val = HAL_ADC_GetValue(&hadc2);
-	  }
-
-	  uint16_t up, down; // Wartoœci do ustalenia
-
-	  if(switched == 0)
-	  {
-		  if(adc1val > up || adc2val < down)
-		  {
-			  switched = 1;
-			  // Wys³ac odpowiedni sygna³
-			  // data[5] = '1';
-		  }
-		  if(adc1val < down || adc2val > up)
-		  {
-			  switched = 2;
-			  // Wys³ac odpowiedni sygna³
-			  // data[5] = '1';
-		  }
-	  }
-	  else
-	  {
-		  if(switched == 1)
-		  {
-			  if(adc1val < down || adc2val > up)
-			  {
-				  switched = 2;
-				  // Wys³ac odpowiedni sygna³
-				  // data[5] = '1';
-			  }
-		  }
-		  else
-		  {
-			  if(switched == 2)
-			  {
-				  if(adc1val > up || adc2val < down)
-				  {
-					  switched = 1;
-					  // Wys³ac odpowiedni sygna³
-					  // data[5] = '1';
-				  }
-				  else
-				  {
-					  switched = 0;
-					  // data[5] = '0';
-				  }
-			  }
-		  }
-	  }
-	  */
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -530,6 +545,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PE4 PE5 PE0 PE1 */
+  GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_0|GPIO_PIN_1;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PC0 PC1 */
