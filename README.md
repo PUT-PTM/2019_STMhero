@@ -26,9 +26,9 @@ Then proceed as in a standard Python compilation.
 
 ### Attributions
 
-Virtual COM Port: https://github.com/xenovacivus/STM32DiscoveryVCP
-Python pygame library: https://www.pygame.org
-Python pyserial library: https://pythonhosted.org/pyserial/
+-Virtual COM Port: https://github.com/xenovacivus/STM32DiscoveryVCP
+-Python pygame library: https://www.pygame.org
+-Python pyserial library: https://pythonhosted.org/pyserial/
 
 ## Credits
 
