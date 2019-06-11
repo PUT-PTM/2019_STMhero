@@ -8,7 +8,11 @@ This projec is mostly based on the idea of Guitar Hero and is based on two parts
 
 ### The hardware
 
-We used photoresistors to create an imitation of strings and buttons to trigger a proper line in the destop app. Dragging was based on an accelerometer.
+We used photoresistors to create an imitation of strings and buttons to trigger a proper line in the destop app. Dragging was based on an accelerometer. We used:
+
+- STM32CubeMX
+- SystemWorkbench for STM32 environment
+- STM32F407 board
 
 ## Credits
 
