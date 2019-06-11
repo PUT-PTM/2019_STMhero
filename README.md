@@ -13,6 +13,22 @@ We used photoresistors to create an imitation of strings and buttons to trigger 
 - STM32CubeMX
 - SystemWorkbench for STM32 environment
 - STM32F407 board
+- PyCharm
+
+### How to run
+
+To run Desktop Application you need to install:
+- python 3.x
+- pygame library
+- pyserial library
+
+Then proceed as in a standard Python compilation.
+
+### Attributions
+
+Virtual COM Port: https://github.com/xenovacivus/STM32DiscoveryVCP
+Python pygame library: https://www.pygame.org
+Python pyserial library: https://pythonhosted.org/pyserial/
 
 ## Credits
 
