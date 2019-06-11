@@ -1,6 +1,19 @@
 # 2019_STMhero
-### Authors: Konrad Kęciński, Karol Kobaka ###
-Technology used:
-- STM23F407VG board
-- SystemWorkbench for STM32 environment
-- STM32CubeMX
+
+## Overview
+
+This projec is mostly based on the idea of Guitar Hero and is based on two parts:
+- the guitar itself along with its software
+- desktop Python-based application
+
+### The hardware
+
+We used photoresistors to create an imitation of strings and buttons to trigger a proper line in the destop app. Dragging was based on an accelerometer.
+
+## Credits
+
+The project was conducted during the Microprocessor Lab course held by the Institute of Control and Information Engineering, Poznan University of Technology.
+
+Contractors: Konrad Kęciński, Karol Kobaka
+
+Supervisor: Tomasz Mańkowski
