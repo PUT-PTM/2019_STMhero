@@ -35,6 +35,7 @@ class Game(object):
     def __init__(self, com):
 
         # Initialization
+        self.ticks = 0
         self.on = 1
         self.max_tps = 119.0
         if com != 'none':
@@ -60,6 +61,7 @@ class Game(object):
 
         # Game loop
         while True:
+            self.ticks += 1
             self.holds = [0, 0, 0, 0]
             if self.pressed[0] > 0:
                 self.pressed[0] -= 1
@@ -184,6 +186,14 @@ class Game(object):
             self.draw()
             pygame.display.flip()
 
+            # End of game
+            if self.ticks == 22800:
+                print("Your score: "+str(self.song.points))
+                self.on = 0
+                pygame.quit()
+                break
+
+
     def tick(self):
         self.text = self.font.render(str(self.song.points), True, (255, 255, 255))
         self.song.tick()
@@ -220,7 +230,10 @@ class Game(object):
 
 
 if __name__ == "__main__":
-    print("Available COM ports: " + str(serial_ports()))
-    print("Enter the name of the COM port or type 'none' for playing on keyboard: ")
-    inp = input()
-    Game(inp)
+    while True:
+        print("Available COM ports: " + str(serial_ports()))
+        print("Enter the name of the COM port or type 'none' for playing on keyboard: ")
+        inp = input()
+        if inp == 'exit':
+            break
+        Game(inp)
